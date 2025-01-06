@@ -37,6 +37,8 @@ export async function POST(request: NextRequest) {
             console.log(user);
 
             user.isVerified = true;
+            user.forgotPasswordToken = undefined;
+            user.forgotPasswordTokenExpiry = undefined;
             await user.save();
         }
 

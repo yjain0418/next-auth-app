@@ -1,10 +1,13 @@
 'use client'
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 
 export default function ResetPasswordPage() {
+  const router = useRouter()
+
   const [email, setEmail] = useState("")
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,6 +35,7 @@ export default function ResetPasswordPage() {
 
       if (data.success) {
         toast.success("Email sent");
+        router.push("/login");
       } else {
         toast.error(data.error || "Login failed.");
       }
