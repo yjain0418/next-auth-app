@@ -1,54 +1,47 @@
-"use client";
-import React, { useEffect } from 'react'
-import { cn } from '@/lib/utils';
-import { Label } from '@/components/ui/label';
+'use client'
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import React, { useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify';
 
-export default function Login() {
+export default function ResetPasswordPage({params}: any) {
   const router = useRouter();
 
-  const [user, setUser] = useState({
-    email: "",
-    password: ""
-  })
-
+  const [password, setPassword] = useState("")
   const [buttonDisabled, setButtonDisabled] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (buttonDisabled) {
       alert("Please fill all the fields");
       return;
     }
 
+    console.log(params.email, password);
     try {
       setLoading(true);
 
-
-      const response = await fetch("/api/users/login", {
+      const response = await fetch("/api/users/changepassword", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: user.email,
-          password: user.password
+          email: params.email,
+          newpassword: password
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        toast.success("Login successful! Redirecting to profile...");
-        router.push("/profile");
+        toast.success("Password changed successfully");
+        router.push("/login");
       } else {
-        toast.error(data.error || "Login failed.");
+        toast.error(data.error || "Password updation failed.");
       }
 
     } catch (error: any) {
@@ -66,41 +59,31 @@ export default function Login() {
   );
 
   useEffect(() => {
-    if (user.email.length > 0 && user.password.length > 0) {
+    if (password.length > 0) {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
     }
-  }, [user])
+  }, [password])
 
   return (
     <div className="max-w-md w-full mx-auto rounded-lg md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black mt-20">
       <ToastContainer />
       <h2 className="font-bold text-2xl text-neutral-800 dark:text-neutral-200 text-center">
-        Welcome to Login Page
+        Enter new Password
       </h2>
 
       <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-5 h-[1px] w-full" />
 
       <form className="my-8" onSubmit={handleSubmit}>
         <div className="flex flex-col space-y-2 w-full mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input
-            id="email"
-            placeholder="user@gmail.com"
-            type="email"
-            value={user.email}
-            onChange={(e) => setUser({ ...user, email: e.target.value })}
-          />
-        </div>
-        <div className="flex flex-col space-y-2 w-full mb-4">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="email">New Password</Label>
           <Input
             id="password"
             placeholder="••••••••"
             type="password"
-            value={user.password}
-            onChange={(e) => setUser({ ...user, password: e.target.value })}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
@@ -110,15 +93,12 @@ export default function Login() {
           type="submit"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Login →"}
+          {loading ? "Updating..." : "Update Password →"}
           <BottomGradient />
         </button>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        <p>Forgot your password? <a href='/resetpassword' className="text-neutral-600 dark:text-neutral-400 hover:underline">Change Password</a></p>
-        <p>Don&apos;t have an account? <a href='/signup' className="text-neutral-600 dark:text-neutral-400 hover:underline">Sign Up</a></p>
       </form>
     </div>
-  );
+  )
 }

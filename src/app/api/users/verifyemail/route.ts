@@ -1,4 +1,4 @@
-import {connect} from '@/dbConfig/dbConfig';
+import { connect } from '@/dbConfig/dbConfig';
 import User from '@/models/userModel';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -7,28 +7,51 @@ connect()
 export async function POST(request: NextRequest) {
     try {
         const reqBody = await request.json();
-        const {token} = reqBody;
+        const { token, emailType } = reqBody;
         console.log(token);
 
-        const user = await User.findOne({verifyToken: token, verifyTokenExpiry: {$gt: Date.now()}});
-
-        if(!user) {
-            return NextResponse.json({error: "Invalid token"}, {status: 400});
+        if (!token || !emailType) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
-        console.log(user);
 
-        user.isVerified = true;
-        user.verifyToken = undefined;
-        user.verifyTokenExpiry = undefined;
+        let user
+        if (emailType === "VERIFY") {
+            user = await User.findOne({ verifyToken: token, verifyTokenExpiry: { $gt: Date.now() } });
 
-        await user.save();
+            if (!user) {
+                return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+            }
+            console.log(user);
+
+            user.isVerified = true;
+            user.verifyToken = undefined;
+            user.verifyTokenExpiry = undefined;
+
+            await user.save();
+        } else if (emailType === "RESET") {
+            user = await User.findOne({ forgotPasswordToken: token, forgotPasswordTokenExpiry: { $gt: Date.now() } });
+
+            if (!user) {
+                return NextResponse.json({ error: "Invalid token" }, { status: 400 });
+            }
+            console.log(user);
+
+            user.isVerified = true;
+            await user.save();
+        }
+
+        const successMessage = emailType === "VERIFY"
+            ? "Email verified successfully"
+            : "Password reset email verified successfully";
 
         return NextResponse.json(
-            {message: "Email verified successfully",
-            success: true
-        }, {status: 200});
+            {
+                message: successMessage,
+                success: true,
+                data: user
+            }, { status: 200 });
 
-    } catch (error : any) {
-        return NextResponse.json({error: error.message}, {status: 500});
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
