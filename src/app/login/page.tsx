@@ -116,7 +116,7 @@ export default function Login() {
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
-        <p>Forgot your password? <a href='/resetpassword' className="text-neutral-600 dark:text-neutral-400 hover:underline">Change Password</a></p>
+        <p className='mb-2'>Forgot your password? <a href='/resetpassword' className="text-neutral-600 dark:text-neutral-400 hover:underline">Change Password</a></p>
         <p>Don&apos;t have an account? <a href='/signup' className="text-neutral-600 dark:text-neutral-400 hover:underline">Sign Up</a></p>
       </form>
     </div>
