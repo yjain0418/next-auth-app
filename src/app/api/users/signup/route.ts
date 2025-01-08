@@ -15,21 +15,30 @@ export async function POST(request: NextRequest) {
 
         const user = await User.findOne({email});
 
-        if(user && user.isVerified) {
-            return NextResponse.json({error: "User already exists"}, {status: 400});
+        if(user) {
+            if(user.isVerified) {
+                return NextResponse.json({error: "User already exists"}, {status: 400});
+            }else {
+                const salt = await bcryptjs.genSalt(10);
+                const hashedPassword = await bcryptjs.hash(password, salt);
+
+                user.password= hashedPassword;
+                await user.save();
+            }
+        }else {
+            const salt = await bcryptjs.genSalt(10);
+            const hashedPassword = await bcryptjs.hash(password, salt);
+    
+            const newUser = new User({
+                username, 
+                email,
+                password: hashedPassword
+            });
+    
+            await newUser.save();
         }
 
-        const salt = await bcryptjs.genSalt(10);
-        const hashedPassword = await bcryptjs.hash(password, salt);
-
-        const newUser = new User({
-            username, 
-            email,
-            password: hashedPassword
-        });
-
-        const savedUser = await newUser.save();
-        console.log(savedUser);
+        const savedUser = await User.findOne({email}).select("-password");
 
         //verification by email
         await sendEmail({email, emailType: "VERIFY", userId: savedUser._id});
