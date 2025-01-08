@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify';
 
-function page() {
+export default function ProfilePage() {
     const router = useRouter();
     const [data, setData] = useState("")
 
@@ -57,5 +57,3 @@ function page() {
     </div>
   )
 }
-
-export default page

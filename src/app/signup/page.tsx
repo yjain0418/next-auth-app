@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 
-export default function Signup() {
+export default function SignupPage() {
   const router = useRouter();
 
   const [user, setUser] = useState({

@@ -5,12 +5,32 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 
-export default function ResetPasswordPage({params}: any) {
+interface ResetPasswordPageProps {
+  params: Promise<{
+    email: string;
+  }>;
+}
+
+export default function ResetPasswordPage({params}: ResetPasswordPageProps) {
   const router = useRouter();
 
+  const [email, setEmail] = useState<string | null>(null);
   const [password, setPassword] = useState("")
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchParams = async () => {
+      try {
+        const resolvedParams = await params;  // Await the promise resolution
+        setEmail(resolvedParams.email);  // Store the email after resolving
+      } catch (error) {
+        console.error("Error resolving params", error);
+      }
+    };
+
+    fetchParams();  // Run the async function
+  }, [params]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,7 +40,7 @@ export default function ResetPasswordPage({params}: any) {
       return;
     }
 
-    console.log(params.email, password);
+    console.log(email, password);
     try {
       setLoading(true);
 
@@ -30,7 +50,7 @@ export default function ResetPasswordPage({params}: any) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: params.email,
+          email: email,
           newpassword: password
         }),
       });
@@ -44,8 +64,8 @@ export default function ResetPasswordPage({params}: any) {
         toast.error(data.error || "Password updation failed.");
       }
 
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
+    } catch (error: unknown) {
+      toast.error((error instanceof Error ? error.message : "Unknown Error Occured") || "Something went wrong.");
     } finally {
       setLoading(false);
     }

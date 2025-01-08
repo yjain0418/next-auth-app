@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
 
-function page() {
+export default function FullProfilePage() {
     const [data, setData] = useState({
         id: "",
         username: "",
@@ -50,5 +50,3 @@ function page() {
     </div>
   )
 }
-
-export default page

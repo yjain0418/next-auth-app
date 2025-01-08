@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import Link from 'next/link';
 
-export default function Login() {
+export default function LoginPage() {
   const router = useRouter();
 
   const [user, setUser] = useState({
