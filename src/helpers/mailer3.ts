@@ -1,11 +1,11 @@
+import sgMail from '@sendgrid/mail';
 import User from '@/models/userModel';
-import nodemailer from 'nodemailer';
 import bcryptjs from 'bcryptjs';
 
 export const sendEmail = async ({ email, emailType, userId }: any) => {
     try {
         const hashedToken = await bcryptjs.hash(userId.toString(), 10);
-
+        
         if (emailType === "VERIFY") {
             await User.findOneAndUpdate(userId, {
                 $set: {
@@ -21,18 +21,11 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                 }
             })
         }
-
-        var transport = nodemailer.createTransport({
-            host: process.env.SMTP_SERVER_HOST,
-            port: 2525,
-            auth: {
-                user: process.env.SMTP_SERVER_USERNAME,
-                pass: process.env.SMTP_SERVER_PASSWORD,
-            }
-        });
-
-        const mailOptions = {
-            from: 'jain.yashu1403@gmail.com',
+        
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY!)
+        
+        const emailData = {
+            from: 'yjain0418@gmail.com',
             to: email,
             subject: emailType === 'VERIFY' ? "Verify your email" : "Reset your password",
             html: `<p>
@@ -46,7 +39,7 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                     If the button doesn't work, don't worry! Simply copy and paste the link below into your browser:  
                     <br><br>
                     <a href="${process.env.DOMAIN}/verifyemail?token=${hashedToken}&type=${emailType}">
-                        ${process.env.DOMAIN}/verifyemail?token=${hashedToken}&type=${emailType}
+                    ${process.env.DOMAIN}/verifyemail?token=${hashedToken}&type=${emailType}
                     </a>  
                     <br><br>
                     If you have any questions, feel free to reach out—we’re always here to help.  
@@ -54,10 +47,17 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                     Cheers,  
                     <br>
                     The Next Auth App Team
-                </p>`,
-        }
-
-        const mailResponse = await transport.sendMail(mailOptions);
+                    </p>`,
+                } 
+                
+        sgMail
+            .send(emailData)
+            .then((response: any) => {
+                console.log('Email sent successfully:', response);
+            })
+            .catch((error: any) => {
+                console.error('Error sending email:', error);
+            });
 
     } catch (error: any) {
         throw new Error(error.message);

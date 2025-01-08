@@ -1,11 +1,11 @@
+import { Resend } from 'resend';
 import User from '@/models/userModel';
-import nodemailer from 'nodemailer';
 import bcryptjs from 'bcryptjs';
 
 export const sendEmail = async ({ email, emailType, userId }: any) => {
     try {
         const hashedToken = await bcryptjs.hash(userId.toString(), 10);
-
+        
         if (emailType === "VERIFY") {
             await User.findOneAndUpdate(userId, {
                 $set: {
@@ -21,18 +21,11 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                 }
             })
         }
-
-        var transport = nodemailer.createTransport({
-            host: process.env.SMTP_SERVER_HOST,
-            port: 2525,
-            auth: {
-                user: process.env.SMTP_SERVER_USERNAME,
-                pass: process.env.SMTP_SERVER_PASSWORD,
-            }
-        });
-
-        const mailOptions = {
-            from: 'jain.yashu1403@gmail.com',
+        
+        const resend = new Resend(process.env.API_KEY);
+        
+        const emailData = {
+            from: 'onboarding@resend.dev',
             to: email,
             subject: emailType === 'VERIFY' ? "Verify your email" : "Reset your password",
             html: `<p>
@@ -55,9 +48,14 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                     <br>
                     The Next Auth App Team
                 </p>`,
-        }
-
-        const mailResponse = await transport.sendMail(mailOptions);
+        } 
+        
+        resend.emails.send(emailData).then(response => {
+            console.log('Email sent successfully:', response);
+        })
+        .catch(error => {
+            console.error('Error sending email:', error);
+        });
 
     } catch (error: any) {
         throw new Error(error.message);

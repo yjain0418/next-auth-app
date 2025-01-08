@@ -1,9 +1,10 @@
 import {connect} from '@/dbConfig/dbConfig';
 import User from '@/models/userModel';
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from '@/helpers/mailer';
+import { sendEmail } from '@/helpers/mailer3';
 
 connect()
+
 
 export async function POST(request: NextRequest) {
     try {
