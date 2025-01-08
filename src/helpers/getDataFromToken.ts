@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
 interface Token{
-    id: String,
-    username: String,
-    email: String
+    id: string,
+    username: string,
+    email: string
 }
 
 export const getDataFromToken = (request: NextRequest) => {
@@ -14,7 +14,7 @@ export const getDataFromToken = (request: NextRequest) => {
         const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET!) as Token;
 
         return decodedToken.id;
-    } catch (error: any) {
-        throw new Error(error.message);
+    } catch (error: unknown) {
+        throw new Error(error instanceof Error ? error.message : "Unknown error occured");
     }
 }

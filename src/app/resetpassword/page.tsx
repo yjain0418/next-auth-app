@@ -40,8 +40,8 @@ export default function ResetPasswordPage() {
         toast.error(data.error || "Login failed.");
       }
 
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
+    } catch (error: unknown) {
+      toast.error((error instanceof Error ? error.message : "Unknown Error Occured") || "Something went wrong.");
     } finally {
       setLoading(false);
     }

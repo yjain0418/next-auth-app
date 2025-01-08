@@ -2,19 +2,25 @@ import sgMail from '@sendgrid/mail';
 import User from '@/models/userModel';
 import bcryptjs from 'bcryptjs';
 
-export const sendEmail = async ({ email, emailType, userId }: any) => {
+interface body {
+    email: string,
+    emailType: string,
+    userId: string
+}
+
+export const sendEmail = async ({ email, emailType, userId }: body) => {
     try {
         const hashedToken = await bcryptjs.hash(userId.toString(), 10);
         
         if (emailType === "VERIFY") {
-            await User.findOneAndUpdate(userId, {
+            await User.findOneAndUpdate({_id : userId}, {
                 $set: {
                     verifyToken: hashedToken,
                     verifyTokenExpiry: Date.now() + 3600000
                 }
             })
         } else if (emailType === "RESET") {
-            await User.findOneAndUpdate(userId, {
+            await User.findOneAndUpdate({_id : userId}, {
                 $set: {
                     forgotPasswordToken: hashedToken,
                     forgotPasswordTokenExpiry: Date.now() + 3600000
@@ -52,14 +58,14 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                 
         sgMail
             .send(emailData)
-            .then((response: any) => {
+            .then((response: unknown) => {
                 console.log('Email sent successfully:', response);
             })
-            .catch((error: any) => {
+            .catch((error: unknown) => {
                 console.error('Error sending email:', error);
             });
 
-    } catch (error: any) {
-        throw new Error(error.message);
+    } catch (error: unknown) {
+        throw new Error(error instanceof Error ? error.message : "Unknown Error Occured");
     }
 }

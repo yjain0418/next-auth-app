@@ -2,6 +2,12 @@ import { connect } from '@/dbConfig/dbConfig';
 import User from '@/models/userModel';
 import { NextRequest, NextResponse } from 'next/server';
 
+class Error {
+    name!: string;
+    message!: string;
+    stack?: string;
+}
+
 connect()
 
 export async function POST(request: NextRequest) {
@@ -53,7 +59,7 @@ export async function POST(request: NextRequest) {
                 data: user
             }, { status: 200 });
 
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: unknown) {
+        return NextResponse.json({error : error instanceof Error ? error.message : "Unknown error occured"}, {status: 500});
     }
 }

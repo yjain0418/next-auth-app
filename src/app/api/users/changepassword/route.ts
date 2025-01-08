@@ -2,8 +2,14 @@ import {connect} from '@/dbConfig/dbConfig';
 import User from '@/models/userModel';
 import { NextRequest, NextResponse } from 'next/server';
 import bcryptjs from 'bcryptjs';
+class Error {
+    name!: string;
+    message!: string;
+    stack?: string;
+}
 
 connect()
+
 
 export async function POST(request: NextRequest) {
     try {
@@ -34,7 +40,7 @@ export async function POST(request: NextRequest) {
             success: true
         }, {status: 200});
 
-    } catch (error : any) {
-        return NextResponse.json({error: error.message}, {status: 500});
+    } catch (error : unknown) {
+        return NextResponse.json({error : error instanceof Error ? error.message : "Unknown error occured"}, {status: 500});
     }
 }

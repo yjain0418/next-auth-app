@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect } from 'react'
-import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -59,8 +58,8 @@ export default function Signup() {
         toast.error(data.error || "Signup failed.");
       }
 
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
+    } catch (error: unknown) {
+      toast.error((error instanceof Error ? error.message : "Unknown Error Occured") || "Something went wrong.");
     } finally {
       setLoading(false);
     }

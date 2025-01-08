@@ -2,19 +2,25 @@ import User from '@/models/userModel';
 import nodemailer from 'nodemailer';
 import bcryptjs from 'bcryptjs';
 
-export const sendEmail = async ({ email, emailType, userId }: any) => {
+interface body {
+    email: string,
+    emailType: string,
+    userId: string
+}
+
+export const sendEmail = async ({ email, emailType, userId }: body) => {
     try {
         const hashedToken = await bcryptjs.hash(userId.toString(), 10);
 
         if (emailType === "VERIFY") {
-            await User.findOneAndUpdate(userId, {
+            await User.findOneAndUpdate({_id : userId}, {
                 $set: {
                     verifyToken: hashedToken,
                     verifyTokenExpiry: Date.now() + 3600000
                 }
             })
         } else if (emailType === "RESET") {
-            await User.findOneAndUpdate(userId, {
+            await User.findOneAndUpdate({_id : userId}, {
                 $set: {
                     forgotPasswordToken: hashedToken,
                     forgotPasswordTokenExpiry: Date.now() + 3600000
@@ -22,7 +28,7 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
             })
         }
 
-        var transport = nodemailer.createTransport({
+        const transport = nodemailer.createTransport({
             host: process.env.SMTP_SERVER_HOST,
             port: 2525,
             auth: {
@@ -57,9 +63,9 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
                 </p>`,
         }
 
-        const mailResponse = await transport.sendMail(mailOptions);
+        await transport.sendMail(mailOptions);
 
-    } catch (error: any) {
-        throw new Error(error.message);
+    } catch (error: unknown) {
+        throw new Error(error instanceof Error ? error.message : "Unknown Error Occured");
     }
 }

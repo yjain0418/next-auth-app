@@ -19,9 +19,9 @@ function page() {
                 username: res.data.data.username,
                 email: res.data.data.email
             });
-        } catch (error: any) {
-            console.log(error.message);
-            toast.error(error.message);    
+        } catch (error: unknown) {
+            console.log(error instanceof Error ? error.message : "Unknown error occured");
+            toast.error(error instanceof Error ? error.message : "Unknown error occured");   
         }
     }
 

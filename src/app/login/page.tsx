@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect } from 'react'
-import { cn } from '@/lib/utils';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import Link from 'next/link';
 
 export default function Login() {
   const router = useRouter();
@@ -51,8 +51,8 @@ export default function Login() {
         toast.error(data.error || "Login failed.");
       }
 
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
+    } catch (error: unknown) {
+      toast.error((error instanceof Error ? error.message : "Unknown error occured") || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -116,8 +116,8 @@ export default function Login() {
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
-        <p className='mb-2'>Forgot your password? <a href='/resetpassword' className="text-neutral-600 dark:text-neutral-400 hover:underline">Change Password</a></p>
-        <p>Don&apos;t have an account? <a href='/signup' className="text-neutral-600 dark:text-neutral-400 hover:underline">Sign Up</a></p>
+        <p className='mb-2'>Forgot your password? <Link href='/resetpassword' className="text-neutral-600 dark:text-neutral-400 hover:underline">Change Password</Link></p>
+        <p>Don&apos;t have an account? <Link href='/signup' className="text-neutral-600 dark:text-neutral-400 hover:underline">Sign Up</Link></p>
       </form>
     </div>
   );

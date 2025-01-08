@@ -19,9 +19,9 @@ export default function verifyEmail() {
         try {
             await axios.post("/api/users/verifyemail", {token, emailType});
             setVerified(true);
-        } catch (error: any) {
+        } catch (error: unknown) {
             setError(true);
-            toast.error(error.message);
+            toast.error(error instanceof Error ? error.message : "Unknown Error Occured");
         }
     }
 

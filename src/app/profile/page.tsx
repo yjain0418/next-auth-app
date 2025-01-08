@@ -14,9 +14,9 @@ function page() {
             const res = await axios.post('/api/users/me');
             setData(res.data.data._id);
             toast.success("Profile fetched successfully");
-        } catch (error: any) {
-            console.log(error.message);
-            toast.error(error.message);    
+        } catch (error: unknown) {
+            console.log(error instanceof Error ? error.message : "Unknown error occured");
+            toast.error(error instanceof Error ? error.message : "Unknown error occured");    
         }
     }
 
@@ -28,9 +28,9 @@ function page() {
             await axios.get('/api/users/logout');
             toast.success("Logout successful");
             router.push('/login');
-        } catch (error: any) {
-            console.log(error.message);
-            toast.error(error.message);  
+        } catch (error: unknown) {
+            console.log(error instanceof Error ? error.message : "Unknown error occured");
+            toast.error(error instanceof Error ? error.message : "Unknown error occured");  
         }
     }
 
