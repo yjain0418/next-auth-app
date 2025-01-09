@@ -31,7 +31,7 @@ export const sendEmail = async ({ email, emailType, userId }: body) => {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY!)
         
         const emailData = {
-            from: 'yjain0418@gmail.com',
+            from: process.env.EMAIL!,
             to: email,
             subject: emailType === 'VERIFY' ? "Verify your email" : "Reset your password",
             html: `<p>

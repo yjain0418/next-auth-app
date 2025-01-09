@@ -15,6 +15,7 @@ function VerifyEmailContent() {
   const [emailType, setEmailType] = useState<string | null>(null);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const handleVerifyEmail = async () => {
     try {
@@ -22,7 +23,7 @@ function VerifyEmailContent() {
       setVerified(true);
     } catch (error: unknown) {
       setError(true);
-      toast.error(error instanceof Error ? error.message : "Unknown Error Occurred");
+      toast.error(error instanceof Error ? error.message : "Unknown error occured");
     }
   };
 
@@ -34,7 +35,7 @@ function VerifyEmailContent() {
       router.push("/resetpassword/" + email);
     } catch (error: unknown) {
       setError(true);
-      toast.error(error instanceof Error ? error.message : "Unknown Error Occurred");
+      toast.error(error instanceof Error ? error.message : "Unknown error occured");
     }
   };
 
@@ -44,17 +45,22 @@ function VerifyEmailContent() {
     const emailTypeReceived = searchParams.get("type");
     setToken(urlToken);
     setEmailType(emailTypeReceived);
+    setIsInitialized(true);
   }, [searchParams]);
 
   useEffect(() => {
-    if (token && emailType) {
-      if (emailType === "VERIFY") {
-        handleVerifyEmail();
-      } else if (emailType === "RESET") {
-        handleResetPassword();
+    if (isInitialized) {
+      if (token && emailType) {
+        if (emailType === "VERIFY") {
+          handleVerifyEmail();
+        } else if (emailType === "RESET") {
+          handleResetPassword();
+        }
+      } else if (!token) {
+        toast.error("No token found");
+      } else if (!emailType) {
+        toast.error("No email type found");
       }
-    } else if (!token) {
-      toast.error("No token found");
     }
   }, [token, emailType]);
 
